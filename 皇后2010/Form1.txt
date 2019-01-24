@@ -1,0 +1,79 @@
+﻿Imports System.IO
+Public Class Form1
+    Dim sw As New StreamWriter("out.txt")
+    Dim sr As New StreamReader("in.txt")
+    Dim h As Integer = sr.ReadLine
+    Dim ans(h, h) As Integer
+    Dim ansarray As New ArrayList
+
+    Sub start(ByVal x As Integer, ByVal y As Integer, ByVal a() As Integer, _
+              ByVal b() As Integer, ByVal c() As Integer, ByVal d() As Integer, _
+               ByVal n As Integer)
+        If y > h Then Exit Sub
+
+        If n = h Then
+            Dim st, st2 As String
+            For i = 1 To h
+                For j = 1 To h
+                    If ans(i, j) = 1 Then st &= i & "," & j & " "
+                    st2 &= ans(i, j) & " "
+                Next
+                st2 &= vbCrLf
+            Next
+            If ansarray.Contains(st) = False Then ansarray.Add(st)
+
+            Exit Sub
+        End If
+
+        Dim tans(h, h) As Integer
+        For i = 1 To h
+            For j = 1 To h
+                tans(i, j) = ans(i, j)
+            Next
+        Next
+
+        Dim ta(h), tb(h), tc(h * 2 - 1), td(h * 2 - 1) As Integer
+        For i = 1 To h
+            ta(i) = a(i)
+            tb(i) = b(i)
+        Next
+        For i = 1 To h * 2 - 1
+            tc(i) = c(i)
+            td(i) = d(i)
+        Next
+        If ta(1) = 0 And x >= 2 Then Exit Sub
+
+        Dim fa, fb, fc, fd As Integer
+        fa = x          '│
+        fb = y          '─
+        fc = x + y - 1  '\
+        fd = h - x + y  '/
+
+        If ta(fa) = 0 And tb(fb) = 0 And tc(fc) = 0 And td(fd) = 0 Then
+            ans(fa, fb) = 1
+            ta(fa) = 1 : tb(fb) = 1 : tc(fc) = 1 : td(fd) = 1   '標記皇后
+            start(x + 1, 1, ta, tb, tc, td, n + 1)
+            ans(fa, fb) = 0
+            ta(fa) = 0 : tb(fb) = 0 : tc(fc) = 0 : td(fd) = 0   '復原標記
+        End If
+
+        start(x, y + 1, ta, tb, tc, td, n)
+
+        For i = 1 To h
+            For j = 1 To h
+                ans(i, j) = tans(i, j)
+            Next
+        Next
+
+    End Sub
+
+    Private Sub Form1_Load(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Load
+        Dim a(h), b(h), c(h * 2 - 1), d(h * 2 - 1) As Integer
+
+        start(1, 1, a, b, c, d, 0)
+
+        sw.WriteLine(ansarray.Count)
+        sw.Flush() : End
+    End Sub
+
+End Class
